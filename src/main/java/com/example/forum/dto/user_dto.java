@@ -9,6 +9,6 @@ public record user_dto(
         String name,
         int __v,    // Versión del documento
         String avatarUrl,
-        String id,  // ID duplicado como en tu ejemplo
+        String id,
         permissions_dto permissions
 ) {}

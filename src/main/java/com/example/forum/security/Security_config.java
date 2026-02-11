@@ -18,13 +18,13 @@ public class Security_config {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // Desactivamos CSRF (no es necesario para APIs con JWT)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Permitimos login y registro sin token
-                        .anyRequest().authenticated()            // Todo lo demás requiere token
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // ¡Importante! No guardamos sesiones en el servidor
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .build();
     }

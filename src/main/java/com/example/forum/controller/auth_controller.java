@@ -3,14 +3,16 @@ package com.example.forum.controller;
 import com.example.forum.dto.auth_response;
 import com.example.forum.dto.login_request;
 import com.example.forum.dto.user_dto;
-import com.example.forum.dto.permissions_dto;
 import com.example.forum.service.jwt_service;
+import com.example.forum.service.user_service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,36 +23,31 @@ public class auth_controller {
 
     @Autowired
     private AuthenticationManager auth_manager;
+
+    @Autowired
+    private user_service user_service;
+
     @PostMapping("/login")
-    public auth_response login(@RequestBody login_request request) {
-        auth_manager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.username(),
-                        request.password()
-                )
-        );
+    public ResponseEntity<auth_response> login(@RequestBody login_request request) {
+        try {
+            // Autenticar usuario
+            Authentication authentication = auth_manager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.username(),
+                            request.password()
+                    )
+            );
 
-        // Generate permissions (fetch from DB later)
-        var permissions = new permissions_dto(
-                List.of("own_topics:write", "own_topics:delete",
-                        "own_replies:write", "own_replies:delete"),
-                List.of()
-        );
+            user_dto user_data = user_service.getUserByEmail(request.username());
 
-        var user_data = new user_dto(
-                "user",
-                "698bf88005181800130b4ccd",
-                "prueba@gmail.com",
-                "prueba",
-                0,
-                "",
-                "698bf88005181800130b4ccd",
-                permissions
-        );
+            String token = jwt_service.generate_token_with_claims(user_data);
 
-        // Generate token with user claims
-        String token = jwt_service.generate_token_with_claims(user_data);
+            return ResponseEntity.ok(new auth_response(user_data, token));
 
-        return new auth_response(user_data, token);
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

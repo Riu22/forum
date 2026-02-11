@@ -85,6 +85,6 @@ public class jwt_service {
         extra_claims.put("id", user_data.id());
         extra_claims.put("permissions", user_data.permissions());
 
-        return create_token(extra_claims, user_data.name()); // Using name as subject
+        return create_token(extra_claims, user_data.name());
     }
 }
