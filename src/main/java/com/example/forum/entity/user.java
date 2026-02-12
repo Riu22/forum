@@ -1,13 +1,19 @@
 package com.example.forum.entity;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class user {
+public class user implements UserDetails {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID) // Generación automática de UUID
     @Column(name = "_id")
     private String id;
 
@@ -26,93 +32,92 @@ public class user {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "moderate_category")
+    private String moderateCategory;
+
     @Version
     @Column(name = "__v")
-    private Integer version;
+    private Integer version; // Hibernate incrementará esto automáticamente
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "permission")
     private List<String> permissions;
 
-    // Constructor vacío
+    // --- CONSTRUCTORES ---
+
+    /**
+     * Constructor vacío requerido por JPA/Hibernate
+     */
     public user() {}
 
-    // Constructor con todos los parámetros
-    public user(String id, String email, String name, String password,
-                String role, String avatarUrl, Integer version, List<String> permissions) {
-        this.id = id;
+    /**
+     * Constructor recomendado para el proceso de Registro.
+     * Observa que NO incluimos 'id' ni 'version', permitiendo que JPA
+     * los asigne correctamente al persistir.
+     */
+    public user(String email, String name, String password, String role,
+                String avatarUrl, String moderateCategory, List<String> permissions) {
         this.email = email;
         this.name = name;
         this.password = password;
         this.role = role;
         this.avatarUrl = avatarUrl;
-        this.version = version;
+        this.moderateCategory = moderateCategory;
         this.permissions = permissions;
     }
 
-    // Getters y Setters
-    public String getId() {
-        return id;
+    // --- MÉTODOS DE SPRING SECURITY (UserDetails) ---
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Convierte el rol simple a un formato que Spring Security entienda
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
+    @Override
+    public String getUsername() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @Override
+    public boolean isAccountNonExpired() { return true; }
 
-    public String getName() {
-        return name;
-    }
+    @Override
+    public boolean isAccountNonLocked() { return true; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
 
-    public String getPassword() {
-        return password;
-    }
+    @Override
+    public boolean isEnabled() { return true; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    // --- GETTERS Y SETTERS ---
 
-    public String getRole() {
-        return role;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public Integer getVersion() {
-        return version;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
 
-    public List<String> getPermissions() {
-        return permissions;
-    }
+    public String getModerateCategory() { return moderateCategory; }
+    public void setModerateCategory(String moderateCategory) { this.moderateCategory = moderateCategory; }
 
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
-    }
+    public Integer getVersion() { return version; }
+    public void setVersion(Integer version) { this.version = version; }
+
+    public List<String> getPermissions() { return permissions; }
+    public void setPermissions(List<String> permissions) { this.permissions = permissions; }
 }
