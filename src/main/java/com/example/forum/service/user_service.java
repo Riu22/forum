@@ -15,14 +15,14 @@ public class user_service {
     @Autowired
     private user_repository user_repository;
 
-    public user_dto getUserByEmail(String email) {
+    public user_dto get_user_by_email(String email) {
         user user = user_repository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         return mapToDto(user);
     }
 
-    public user_dto getUserById(String id) {
+    public user_dto get_user_by_id(String id) {
         user user = user_repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
