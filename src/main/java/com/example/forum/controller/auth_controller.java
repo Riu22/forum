@@ -45,7 +45,7 @@ public class auth_controller {
                     )
             );
 
-            user_dto user_data = user_service.getUserByEmail(request.email()    );
+            user_dto user_data = user_service.get_user_by_email(request.email()    );
             String token = jwt_service.generate_token_with_claims(user_data);
 
             return ResponseEntity.ok(new auth_response(user_data, token));

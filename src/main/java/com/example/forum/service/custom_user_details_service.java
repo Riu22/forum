@@ -26,7 +26,7 @@ public class custom_user_details_service implements UserDetailsService {
                     return org.springframework.security.core.userdetails.User
                             .withUsername(user.getEmail())
                             .password(user.getPassword())
-                            .roles(user.getRole() != null ? user.getRole() : "USER")
+                            .authorities(user.getRole() != null ? user.getRole() : "admin")
                             .build();
                 })
                 .orElseThrow(() -> {

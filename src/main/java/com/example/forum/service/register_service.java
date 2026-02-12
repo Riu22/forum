@@ -38,10 +38,10 @@ public class register_service {
                 request.email(),
                 request.name(),
                 passwordEncoder.encode(request.password()),
-                request.role(),
-                null, // avatarUrl por defecto
+                "admin",
+                null,
                 request.moderateCategory(),
-                List.of() // lista de permisos inicial vacía
+                List.of()
         );
 
         user savedUser = user_repository.save(newUser);

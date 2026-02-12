@@ -31,9 +31,22 @@ public class user_service {
 
     private user_dto mapToDto(user user) {
         permissions_dto permissions = new permissions_dto(
-                user.getPermissions() != null ? user.getPermissions() :
-                        List.of("own_topics:write", "own_topics:delete",
-                                "own_replies:write", "own_replies:delete"),
+                user.getPermissions() != null && !user.getPermissions().isEmpty()
+                        ? user.getPermissions()
+                        : List.of(
+                        "topics:read",
+                        "topics:write",
+                        "topics:delete",
+                        "replies:read",
+                        "replies:write",
+                        "replies:delete",
+                        "users:read",
+                        "users:write",
+                        "users:delete",
+                        "categories:read",
+                        "categories:write",
+                        "categories:delete"
+                ),
                 List.of()
         );
 
