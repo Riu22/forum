@@ -8,7 +8,7 @@ import com.example.forum.service.jwt_service;
 import com.example.forum.service.register_service;
 import com.example.forum.service.user_service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy; // Importante
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

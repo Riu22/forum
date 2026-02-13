@@ -35,7 +35,7 @@ public class Security_config {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/auth/**").permitAll()
+                        .requestMatchers("/login", "/register", "/categories").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
