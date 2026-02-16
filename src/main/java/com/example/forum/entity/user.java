@@ -37,14 +37,24 @@ public class user implements UserDetails {
 
     @Version
     @Column(name = "__v")
-    private Integer version; // Hibernate incrementará esto automáticamente
+    private Integer version;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "permission")
     private List<String> permissions;
 
-    // --- CONSTRUCTORES ---
+    @OneToMany(mappedBy = "moderator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<categori> categories;
+
+    public List<categori> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<categori> categories) {
+        this.categories = categories;
+    }
+// --- CONSTRUCTORES ---
 
     /**
      * Constructor vacío requerido por JPA/Hibernate
