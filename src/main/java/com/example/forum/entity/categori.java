@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 @Table(name = "category")
 public class categori {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
     String id;
     String title;
     String description;

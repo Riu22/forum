@@ -13,8 +13,8 @@ import java.util.List;
 public class user implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) // Generación automática de UUID
-    @Column(name = "_id")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "_id",updatable = false, nullable = false)
     private String id;
 
     @Column(nullable = false, unique = true)

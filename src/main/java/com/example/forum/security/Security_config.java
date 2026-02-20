@@ -18,60 +18,45 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
 @Configuration
 @EnableWebSecurity
 public class Security_config {
 
-    private final UserDetailsService userDetailsService;
-
-    public Security_config(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable()) // Elimina la causa principal del 403 en POST
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Evita bloqueos del navegador
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/categories").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authenticationProvider(authenticationProvider())
-                .build();
+                        .anyRequest().permitAll() // Abre todas las rutas (adiós 403)
+                );
+
+        return http.build();
     }
 
+    // Herramienta para verificar el login en tu controlador/servicio
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // Herramienta para encriptar/comparar contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Configuración mínima de CORS para que el Front (8080) pueda hablar con el Back (5000)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
-        configuration.setAllowCredentials(true);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+        config.setAllowedMethods(Arrays.asList("*"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record user_dto(
         String role,
-        String _id, // Campo compatible con formato tipo MongoDB
+        String _id,
         String email,
         String name,
-        int __v,    // Versión del documento
+        int __v,
         String avatarUrl,
         String id,
         permissions_dto permissions
