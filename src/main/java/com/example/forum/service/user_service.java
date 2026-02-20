@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class user_service {
@@ -30,25 +31,7 @@ public class user_service {
     }
 
     private user_dto mapToDto(user user) {
-        permissions_dto permissions = new permissions_dto(
-                user.getPermissions() != null && !user.getPermissions().isEmpty()
-                        ? user.getPermissions()
-                        : List.of(
-                        "topics:read",
-                        "topics:write",
-                        "topics:delete",
-                        "replies:read",
-                        "replies:write",
-                        "replies:delete",
-                        "users:read",
-                        "users:write",
-                        "users:delete",
-                        "categories:read",
-                        "categories:write",
-                        "categories:delete"
-                ),
-                List.of()
-        );
+        permissions_dto permissions = buildAdminPermissions();
 
         return new user_dto(
                 user.getRole(),
@@ -59,6 +42,27 @@ public class user_service {
                 user.getAvatarUrl() != null ? user.getAvatarUrl() : "",
                 user.getId(),
                 permissions
+        );
+    }
+    private permissions_dto buildAdminPermissions() {
+        return new permissions_dto(
+                List.of(
+                        "own_topics:write",
+                        "own_topics:delete",
+                        "own_replies:write",
+                        "own_replies:delete",
+                        "categories:write",
+                        "categories:delete"
+                ),
+                Map.of(
+                        "*",
+                        List.of(
+                                "categories_topics:write",
+                                "categories_topics:delete",
+                                "categories_replies:write",
+                                "categories_replies:delete"
+                        )
+                )
         );
     }
 }

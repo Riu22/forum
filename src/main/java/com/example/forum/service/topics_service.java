@@ -39,7 +39,7 @@ public class topics_service {
     }
 
     public topicsDto create_topic(topic_request request) {
-        categori cat = categori_repository.findByNombre(request.category_name())
+        categori cat = categori_repository.findByTitle(request.category_name())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
         topics newTopic = new topics();

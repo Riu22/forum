@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class register_service {
@@ -54,11 +55,33 @@ public class register_service {
                 savedUser.getVersion(),
                 savedUser.getAvatarUrl(),
                 savedUser.getId(),
-                new permissions_dto(List.of(), List.of())
+                buildAdminPermissions()
         );
 
         String token = jwt_service.generate_token(savedUser.getEmail(), userDto);
 
         return new auth_response(userDto, token);
+    }
+
+    private permissions_dto buildAdminPermissions() {
+        return new permissions_dto(
+                List.of(
+                        "own_topics:write",
+                        "own_topics:delete",
+                        "own_replies:write",
+                        "own_replies:delete",
+                        "categories:write",
+                        "categories:delete"
+                ),
+                Map.of(
+                        "*",
+                        List.of(
+                                "categories_topics:write",
+                                "categories_topics:delete",
+                                "categories_replies:write",
+                                "categories_replies:delete"
+                        )
+                )
+        );
     }
 }
