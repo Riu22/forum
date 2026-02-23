@@ -77,11 +77,9 @@ public class user implements UserDetails {
         this.permissions = permissions;
     }
 
-    // --- MÉTODOS DE SPRING SECURITY (UserDetails) ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convierte el rol simple a un formato que Spring Security entienda
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
     }
 
@@ -102,7 +100,6 @@ public class user implements UserDetails {
     @Override
     public boolean isEnabled() { return true; }
 
-    // --- GETTERS Y SETTERS ---
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
