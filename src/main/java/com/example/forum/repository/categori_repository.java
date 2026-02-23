@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface categori_repository extends JpaRepository<categori, String> {
-    categori findBySlug(String slug);
+    Optional<categori> findBySlug(String slug);
     Optional<categori> findByTitle(String nombre);
 }

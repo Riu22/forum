@@ -8,7 +8,9 @@ import java.sql.Date;
 @Table(name = "topics")
 public class topics {
     @Id
-    int id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    String id;
     Date created_at;
     Date updated_at;
     String title;
@@ -20,9 +22,25 @@ public class topics {
     @JoinColumn(name = "category_id")
     private categori category;
 
-    public int getId() {
+    public user getUser() {
+        return user;
+    }
+
+    public void setUser(user user) {
+        this.user = user;
+    }
+
+    public String getId() {
         return id;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private user user;
 
     public categori getCategory() {
         return category;
@@ -32,9 +50,6 @@ public class topics {
         this.category = category;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public Date getCreated_at() {
         return created_at;

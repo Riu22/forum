@@ -3,7 +3,10 @@ package com.example.forum.service;
 import com.example.forum.dto.categoriDto;
 import com.example.forum.dto.request_categoriDto;
 import com.example.forum.entity.categori;
+import com.example.forum.entity.topics;
 import com.example.forum.repository.categori_repository;
+import com.example.forum.repository.reply_repository;
+import com.example.forum.repository.topics_repository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,11 @@ import java.util.Random;
 public class categori_service {
     @Autowired
     categori_repository categori_repository;
+    @Autowired
+    topics_repository topics_repository;
+    @Autowired
+    reply_repository reply_repository;
+
 
     public List<categoriDto> get_categories() {
         return categori_repository.findAll().stream()
@@ -63,18 +71,39 @@ public class categori_service {
     }
 
     public categoriDto get_category_by_slug(String slug) {
-        categori cat = categori_repository.findBySlug(slug);
-        if (cat == null) {
-            return null;
+        return categori_repository.findBySlug(slug)
+                .map(cat -> new categoriDto(
+                        cat.getId(),
+                        Collections.emptyList(),
+                        cat.getTitle(),
+                        cat.getDescription(),
+                        cat.getSlug(),
+                        cat.getColor(),
+                        cat.get__v()
+                ))
+                .orElse(null);
+    }
+    public categoriDto update_category(String slug, String title, String description) {
+        categori cat = categori_repository.findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+        cat.setTitle(title);
+        cat.setDescription(description);
+        categori saved = categori_repository.save(cat);
+        return new categoriDto(saved.getId(), Collections.emptyList(), saved.getTitle(),
+                saved.getDescription(), saved.getSlug(), saved.getColor(), saved.get__v());
+    }
+
+    public void delete_category(String slug) {
+        categori cat = categori_repository.findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        List<topics> cat_topics = topics_repository.findByCategorySlug(slug);
+        for (topics topic : cat_topics) {
+            reply_repository.deleteByTopicId(topic.getId());
         }
-        return new categoriDto(
-                cat.getId(),
-                Collections.emptyList(),
-                cat.getTitle(),
-                cat.getDescription(),
-                cat.getSlug(),
-                cat.getColor(),
-                cat.get__v()
-        );
+
+        topics_repository.deleteAll(cat_topics);
+
+        categori_repository.delete(cat);
     }
 }

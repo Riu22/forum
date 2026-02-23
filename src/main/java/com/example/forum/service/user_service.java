@@ -30,7 +30,7 @@ public class user_service {
         return mapToDto(user);
     }
 
-    private user_dto mapToDto(user user) {
+    public user_dto mapToDto(user user) {
         permissions_dto permissions = buildAdminPermissions();
 
         return new user_dto(

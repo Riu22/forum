@@ -30,7 +30,7 @@ public class jwt_service {
         extra_claims.put("id", user_info.id());
         extra_claims.put("permissions", user_info.permissions());
 
-        return create_token(extra_claims, username);
+        return create_token(extra_claims, user_info.email());
     }
 
     private String create_token(Map<String, Object> claims, String subject) {
@@ -85,6 +85,6 @@ public class jwt_service {
         extra_claims.put("id", user_data.id());
         extra_claims.put("permissions", user_data.permissions());
 
-        return create_token(extra_claims, user_data.name());
+        return create_token(extra_claims, user_data.email());
     }
 }
