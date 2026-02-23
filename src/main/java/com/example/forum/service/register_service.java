@@ -26,15 +26,12 @@ public class register_service {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Transactional // Recomendado para asegurar la integridad de la base de datos
+    @Transactional
     public auth_response register(register_request request) {
-        // 1. Validar si el usuario ya existe
         if (user_repository.existsByEmail(request.email())) {
             throw new RuntimeException("Email already in use");
         }
 
-        // 2. Crear la entidad usando el nuevo constructor simplificado
-        // No pasamos ID ni Version; JPA los generará automáticamente
         user newUser = new user(
                 request.email(),
                 request.name(),

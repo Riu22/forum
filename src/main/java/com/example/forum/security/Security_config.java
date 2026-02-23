@@ -25,28 +25,25 @@ public class Security_config {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Elimina la causa principal del 403 en POST
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Evita bloqueos del navegador
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Abre todas las rutas (adiós 403)
+                        .anyRequest().permitAll()
                 );
 
         return http.build();
     }
 
-    // Herramienta para verificar el login en tu controlador/servicio
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // Herramienta para encriptar/comparar contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Configuración mínima de CORS para que el Front (8080) pueda hablar con el Back (5000)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

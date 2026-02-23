@@ -54,18 +54,7 @@ public class user implements UserDetails {
     public void setCategories(List<categori> categories) {
         this.categories = categories;
     }
-// --- CONSTRUCTORES ---
 
-    /**
-     * Constructor vacío requerido por JPA/Hibernate
-     */
-    public user() {}
-
-    /**
-     * Constructor recomendado para el proceso de Registro.
-     * Observa que NO incluimos 'id' ni 'version', permitiendo que JPA
-     * los asigne correctamente al persistir.
-     */
     public user(String email, String name, String password, String role,
                 String avatarUrl, String moderateCategory, List<String> permissions) {
         this.email = email;

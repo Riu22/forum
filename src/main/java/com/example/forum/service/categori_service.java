@@ -49,9 +49,8 @@ public class categori_service {
 
         categori saved_categori = categori_repository.save(entiti);
 
-        // Now getId() has the generated UUID
         saved_categori.setSlug(saved_categori.getId() + "-" + saved_categori.getTitle().replace(" ", "-"));
-        categori_repository.save(saved_categori); // save again with the slug
+        categori_repository.save(saved_categori);
 
         return new categoriDto(
                 saved_categori.getId(),
