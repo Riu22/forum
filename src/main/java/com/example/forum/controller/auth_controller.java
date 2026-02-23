@@ -65,4 +65,46 @@ public class auth_controller {
         auth_response response = register_service.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @GetMapping("/getprofile")
+    public ResponseEntity<?> get_profile(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+        }
+
+    }
+    /*
+avatarUrl
+:
+""
+email
+:
+"riu@gmail.com"
+iat
+:
+1771873305
+id
+:
+"698e1bc505181800130b4cdd"
+name
+:
+"riu"
+permissions
+:
+{root: ["own_topics:write", "own_topics:delete", "own_replies:write", "own_replies:delete",…],…}
+categories
+:
+{,…}
+root
+:
+["own_topics:write", "own_topics:delete", "own_replies:write", "own_replies:delete",…]
+role
+:
+"admin"
+__v
+:
+0
+_id
+:
+"698e1bc505181800130b4cdd"     */
 }
