@@ -1,6 +1,7 @@
 package com.example.forum.service;
 
 import com.example.forum.repository.user_repository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,18 +9,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class custom_user_details_service implements UserDetailsService {
+    @Autowired
+    private user_repository user_repository;
 
-    private final user_repository userRepository;
-
-    public custom_user_details_service(user_repository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("Buscando usuario: " + email);
 
-        return userRepository.findByEmail(email)
+        return user_repository.findByEmail(email)
                 .map(user -> {
                     System.out.println("Usuario encontrado: " + user.getEmail());
                     System.out.println("Password en BD: " + user.getPassword());

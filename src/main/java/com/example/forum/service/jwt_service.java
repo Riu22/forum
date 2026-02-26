@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +17,16 @@ import java.util.function.Function;
 
 @Service
 public class jwt_service {
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
-    private static final String SECRET_KEY = "Y2xhdmVfc2VjcmV0YV9tdXlfZmllcnRlX3BhcmFfZWxfZm9ydW1fcHJvamVjdF8yMDI0";
+    @Value("${jwt.expiration}")
+    private long JWT_EXPIRATION;
 
-    // Modificado: Limpiamos los claims pesados
     public String generate_token(String username, user_dto user_info) {
         Map<String, Object> extra_claims = new HashMap<>();
         extra_claims.put("role", user_info.role());
         extra_claims.put("id", user_info.id());
-        // NO poner avatarUrl aquí si es Base64
 
         return create_token(extra_claims, user_info.email());
     }
@@ -34,7 +36,7 @@ public class jwt_service {
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .expiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
                 .signWith(get_signing_key())
                 .compact();
     }
