@@ -128,5 +128,9 @@ public class index_controller {
         topics_service.delete_topic(id, token);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/topics/{topic_id}/replies")
+    public ResponseEntity<?> get_replies_by_topic(@PathVariable String topic_id) {
+        return ResponseEntity.ok(reply_service.get_replies_by_topic(topic_id));
+    }
 
 }

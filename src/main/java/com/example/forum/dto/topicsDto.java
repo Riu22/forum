@@ -17,6 +17,6 @@ public record topicsDto (
         categoriDto_nested category,
         user_dto user,
         @JsonProperty("__v") int __v,
-        List<Object> replies
+        List<replyDto> replies
 )
 {}

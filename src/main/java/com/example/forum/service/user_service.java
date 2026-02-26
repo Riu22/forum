@@ -1,10 +1,10 @@
 package com.example.forum.service;
 
-import com.example.forum.dto.user_dto;
-import com.example.forum.dto.permissions_dto;
+import com.example.forum.dto.*;
 import com.example.forum.entity.user;
 import com.example.forum.repository.user_repository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +15,12 @@ public class user_service {
 
     @Autowired
     private user_repository user_repository;
+    @Autowired
+    private jwt_service jwt_service;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
 
     public user_dto get_user_by_email(String email) {
         user user = user_repository.findByEmail(email)
@@ -65,4 +71,43 @@ public class user_service {
                 )
         );
     }
+
+    public user_dto get_profile(String token) {
+        String email = jwt_service.extract_user_name(token);
+        user user = user_repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return mapToDto(user);
+    }
+
+    public auth_response update_profile(String token, update_profile_request request) {
+        String currentEmail = jwt_service.extract_user_name(token);
+        user user = user_repository.findByEmail(currentEmail)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (request.name() != null) user.setName(request.name());
+
+        if (request.email() != null) user.setEmail(request.email());
+
+        user_repository.save(user);
+
+        user_dto userDto = mapToDto(user);
+        String newToken = jwt_service.generate_token_with_claims(userDto);
+
+        return new auth_response(userDto, newToken);
+    }
+
+    public user_dto update_password(String token, update_password_request request) {
+        String email = jwt_service.extract_user_name(token);
+        user user = user_repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new RuntimeException("Contraseña actual incorrecta");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user_repository.save(user);
+        return mapToDto(user);
+    }
+
 }

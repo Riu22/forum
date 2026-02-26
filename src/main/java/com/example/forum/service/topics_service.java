@@ -3,6 +3,7 @@ package com.example.forum.service;
 import com.example.forum.dto.topic_request;
 import com.example.forum.dto.topicsDto;
 import com.example.forum.dto.categoriDto_nested;
+import com.example.forum.dto.replyDto;
 import com.example.forum.entity.categori;
 import com.example.forum.entity.topics;
 import com.example.forum.entity.user;
@@ -53,6 +54,18 @@ public class topics_service {
             );
         }
 
+        List<replyDto> replies = reply_repository.findByTopicId(entity.getId()).stream()
+                .map(r -> new replyDto(
+                        r.getId(),
+                        r.getContent(),
+                        entity.getId(),
+                        r.getUser() != null ? user_service.mapToDto(r.getUser()) : null,
+                        r.getCreated_at(),
+                        r.getUpdated_at(),
+                        r.get__v()
+                ))
+                .toList();
+
         return new topicsDto(
                 entity.getId(),
                 entity.getTitle(),
@@ -64,7 +77,7 @@ public class topics_service {
                 catDto,
                 entity.getUser() != null ? user_service.mapToDto(entity.getUser()) : null,
                 0,
-                List.of()
+                replies
         );
     }
 
