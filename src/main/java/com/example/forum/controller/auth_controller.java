@@ -1,12 +1,10 @@
 package com.example.forum.controller;
 
-import com.example.forum.dto.auth_response;
-import com.example.forum.dto.login_request;
-import com.example.forum.dto.register_request;
-import com.example.forum.dto.user_dto;
+import com.example.forum.dto.*;
 import com.example.forum.service.jwt_service;
 import com.example.forum.service.register_service;
 import com.example.forum.service.user_service;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -61,50 +59,49 @@ public class auth_controller {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<auth_response> register(@RequestBody register_request request){
-        auth_response response = register_service.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> register(@RequestBody register_request request) {
+        try {
+            auth_response response = register_service.register(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
     @GetMapping("/getprofile")
-    public ResponseEntity<?> get_profile(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+    public ResponseEntity<?> get_profile(HttpServletRequest http_request) {
+        String auth_header = http_request.getHeader("Authorization");
+
+        if (auth_header == null || !auth_header.startsWith("Bearer ") || auth_header.length() <= 7) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token no proporcionado o inválido");
         }
 
+        String token = auth_header.substring(7).trim();
+        return ResponseEntity.ok(user_service.get_profile(token));
     }
-    /*
-avatarUrl
-:
-""
-email
-:
-"riu@gmail.com"
-iat
-:
-1771873305
-id
-:
-"698e1bc505181800130b4cdd"
-name
-:
-"riu"
-permissions
-:
-{root: ["own_topics:write", "own_topics:delete", "own_replies:write", "own_replies:delete",…],…}
-categories
-:
-{,…}
-root
-:
-["own_topics:write", "own_topics:delete", "own_replies:write", "own_replies:delete",…]
-role
-:
-"admin"
-__v
-:
-0
-_id
-:
-"698e1bc505181800130b4cdd"     */
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> update_profile(@RequestBody update_profile_request request, HttpServletRequest http_request) {
+        String auth_header = http_request.getHeader("Authorization");
+        if (auth_header == null || !auth_header.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+        }
+        try {
+            String token = auth_header.substring(7).trim();
+            auth_response response = user_service.update_profile(token, request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/profile/password")
+    public ResponseEntity<?> update_password(@RequestBody update_password_request request, HttpServletRequest http_request) {
+        String auth_header = http_request.getHeader("Authorization");
+        if (auth_header == null || !auth_header.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+        }
+        String token = auth_header.substring(7);
+        return ResponseEntity.ok(user_service.update_password(token, request));
+    }
 }

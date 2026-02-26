@@ -1,6 +1,9 @@
 package com.example.forum.service;
 
+import com.example.forum.dto.categoriDto_nested;
 import com.example.forum.dto.replyDto;
+import com.example.forum.dto.topicsDto;
+import com.example.forum.entity.categori;
 import com.example.forum.entity.reply;
 import com.example.forum.entity.topics;
 import com.example.forum.entity.user;
@@ -9,6 +12,9 @@ import com.example.forum.repository.topics_repository;
 import com.example.forum.repository.user_repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 
 @Service
 public class reply_service {
@@ -79,5 +85,22 @@ public class reply_service {
                 .orElseThrow(() -> new RuntimeException("Reply no encontrada"));
         reply_repository.delete(existing);
     }
+
+    public List<replyDto> get_replies_by_topic(String topic_id) {
+        List<reply> rawReplies = reply_repository.findByTopicId(topic_id);
+        System.out.println("Topic id: " + topic_id + " - Replies encontradas: " + rawReplies.size());
+        return rawReplies.stream()
+                .map(r -> new replyDto(
+                        r.getId(),
+                        r.getContent(),
+                        topic_id,
+                        r.getUser() != null ? user_service.mapToDto(r.getUser()) : null,
+                        r.getCreated_at(),
+                        r.getUpdated_at(),
+                        r.get__v()
+                ))
+                .toList();
+    }
+
 
 }

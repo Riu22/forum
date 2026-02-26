@@ -29,7 +29,7 @@ public class user implements UserDetails {
     @Column(nullable = false)
     private String role;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", columnDefinition = "LONGTEXT")
     private String avatarUrl;
 
     @Column(name = "moderate_category")
@@ -54,6 +54,9 @@ public class user implements UserDetails {
     public void setCategories(List<categori> categories) {
         this.categories = categories;
     }
+
+    public user() {}
+
 
     public user(String email, String name, String password, String role,
                 String avatarUrl, String moderateCategory, List<String> permissions) {

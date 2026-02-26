@@ -1,6 +1,6 @@
 package com.example.forum.service;
 
-import com.example.forum.dto.user_dto; // Importante importar tu record
+import com.example.forum.dto.user_dto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -19,16 +19,12 @@ public class jwt_service {
 
     private static final String SECRET_KEY = "Y2xhdmVfc2VjcmV0YV9tdXlfZmllcnRlX3BhcmFfZWxfZm9ydW1fcHJvamVjdF8yMDI0";
 
+    // Modificado: Limpiamos los claims pesados
     public String generate_token(String username, user_dto user_info) {
         Map<String, Object> extra_claims = new HashMap<>();
         extra_claims.put("role", user_info.role());
-        extra_claims.put("_id", user_info._id());
-        extra_claims.put("email", user_info.email());
-        extra_claims.put("name", user_info.name());
-        extra_claims.put("__v", user_info.__v());
-        extra_claims.put("avatarUrl", user_info.avatarUrl());
         extra_claims.put("id", user_info.id());
-        extra_claims.put("permissions", user_info.permissions());
+        // NO poner avatarUrl aquí si es Base64
 
         return create_token(extra_claims, user_info.email());
     }
@@ -77,14 +73,7 @@ public class jwt_service {
     public String generate_token_with_claims(user_dto user_data) {
         Map<String, Object> extra_claims = new HashMap<>();
         extra_claims.put("role", user_data.role());
-        extra_claims.put("_id", user_data._id());
-        extra_claims.put("email", user_data.email());
-        extra_claims.put("name", user_data.name());
-        extra_claims.put("__v", user_data.__v());
-        extra_claims.put("avatarUrl", user_data.avatarUrl());
         extra_claims.put("id", user_data.id());
-        extra_claims.put("permissions", user_data.permissions());
-
         return create_token(extra_claims, user_data.email());
     }
 }
